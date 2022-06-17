@@ -42,9 +42,9 @@ const ListItem = ({article, onPress}: Props) => {
         <View style={styles.bottomItem}>
           <Entypo name="price-tag" size={14} color="gray" />
           {
-            article.tags.map(tag => {
+            article.tags.map((tag, index) => {
               return (
-                <Text style={styles.tags} numberOfLines={1}>
+                <Text style={styles.tags} key={index} numberOfLines={1}>
                   {` ${tag.name} `}
                 </Text>)
             })

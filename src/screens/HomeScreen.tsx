@@ -46,7 +46,6 @@ export default HomeScreen = ({navigation}) => {
           <ListItem 
             article={item}
             onPress={() => navigation.navigate('Article', {article: item})}
-            key={index.toString()} 
           />
         )}
         keyExtractor={(item, index) => index.toString()}
