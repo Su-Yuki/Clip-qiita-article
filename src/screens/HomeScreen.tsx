@@ -43,7 +43,7 @@ export default HomeScreen = ({navigation}) => {
       const response = await axios
         .get(`${url}&page=${page}`, {
           headers: {
-            Authorization: "Bearer 527a0d3696e695fc32b466684e7347ba0fc01de8",
+            Authorization: "Bearer hoge",
             "content-type": "application/json",
             "charset":      "utf-8" 
           }
