@@ -1,6 +1,6 @@
 // ----[ import ]---------------------------------------------------------------
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, FlatList, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, FlatList, SafeAreaView, RefreshControl } from 'react-native';
 
 import axios from 'axios';
 
@@ -10,30 +10,50 @@ import ListItem from '../components/ListItem'
 import { Article } from '../types/article';
 
 // ---[ process ]---------------------------------------------------------------
-const limit = 10;
+const limit = 3;
 const page  = 1;
-const url   = `https://qiita.com/api/v2/items?page=${page}&per_page=${limit}`;
+const url   = `https://qiita.com/api/v2/items?per_page=${limit}`;
 
 export default HomeScreen = ({navigation}) => {
   const [articles, setArticles] = useState([]);
+  const pageRef = useRef(1);
+  const [refreshing, setRefreshing] = useState(false);
+  const fetchedAllRef = useRef(false);
 
   useEffect(() => { 
-    fetchArticles();
+    fetchArticles(1);
   }, []);
 
-  const fetchArticles = async () => {
+  const onEndReached = () => {
+    if(!fetchedAllRef.current){
+      pageRef.current = pageRef.current + 1
+      fetchArticles(pageRef.current);
+    }
+  };
+
+  const onRefresh = async() => {
+    setArticles([]);
+    pageRef.current = 1;
+    fetchedAllRef.current = false;
+    await fetchArticles(1);
+  };
+
+  const fetchArticles = async (page: number) => {
     try {
       const response = await axios
-        .get(url, {
+        .get(`${url}&page=${page}`, {
           headers: {
-            // Authorization: "Bearer hoge",
+            Authorization: "Bearer 527a0d3696e695fc32b466684e7347ba0fc01de8",
             "content-type": "application/json",
             "charset":      "utf-8" 
           }
         });
-      setArticles(response.data);
+        setArticles(prevArticles => [
+          ...prevArticles,
+          ...response.data,
+        ]);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   }
 
@@ -49,6 +69,13 @@ export default HomeScreen = ({navigation}) => {
           />
         )}
         keyExtractor={(item, index) => index.toString()}
+        onEndReached={onEndReached}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       />
     </SafeAreaView>
   );
